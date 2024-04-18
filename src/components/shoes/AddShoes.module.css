@@ -1,0 +1,73 @@
+.input {
+    max-width: 60rem;
+  width: 60%;
+  margin: 2rem auto;
+  animation: meals-appear 1s ease-out forwards;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    border-radius: 14px;
+    background-color: rgb(255, 255, 255);
+    padding: 1rem;
+    margin-top: -15rem;
+  }
+  
+  .input label {
+    display: block;
+    font-weight: bold;
+  }
+  .input h2 {
+    text-align: center;
+  } 
+
+  .input h3 {
+    text-align: center;
+  }
+  
+  .input input {
+    font: inherit;
+    display: block;
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 0.15rem;
+    margin-bottom: 0.5rem;
+    border-radius: 14px;
+  }
+
+  .input button {
+    font: inherit;
+    border: 1px solid rgb(53, 53, 204);
+    background: rgb(53, 53, 204);
+    color: white;
+    padding: 0.25rem 1rem;
+    cursor: pointer;
+    border-radius: 10px;
+    font-weight: bold;
+
+  }
+  
+  .input button:hover,
+  .input button:active {
+    background: rgb(108, 108, 180);
+    border-color: rgb(108, 108, 180);
+    font-weight: bold;
+  }
+  
+  .input button:focus {
+    outline: none;
+  }
+  
+  .input input:focus {
+    outline: none;
+    border-color: #4f005f;
+  }
+
+  @keyframes meals-appear {
+    from {
+      opacity: 0;
+      transform: translateY(3rem);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
