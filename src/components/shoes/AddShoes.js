@@ -1,8 +1,10 @@
-import { Fragment, useRef } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Card from "../../UI/Card";
 import classes from './AddShoes.module.css'
+import ShoesAvailableList from "./ShoesAvailableList";
 
 const AddShoes = props => {
+    const [shoes,setShoes] = useState([]);
     const nameInputRef=useRef();
     const desInputRef=useRef();
     const priceInputRef=useRef();
@@ -10,19 +12,81 @@ const AddShoes = props => {
     const mediumInputRef=useRef();
     const smallInputRef=useRef();
 
-    const onAddShoeHandler=event=>{
-        event.preventDefault();
-        const shoes={
-            name:nameInputRef.current.value,
-            description:desInputRef.current.value,
-            price:priceInputRef.current.value,
-            qLarge:largeInputRef.current.value,
-            qMedium:mediumInputRef.current.value,
-            qSmall:smallInputRef.current.value
+   
+
+    const fetchShoeList=useCallback(async()=>{
+        try{
+            const response = await fetch('https://shoe-react-project-default-rtdb.firebaseio.com/shoes.json')
+            const data = await response.json()
+            if(!response.ok){
+                throw new Error('Something went wrong');
+            }
+            const loadedShoes=[];
+            for(const key in data){
+                loadedShoes.push({
+                    id:key,
+                    name:data[key].name,
+                    description:data[key].description,
+                    price:data[key].price,
+                    qLarge:data[key].qLarge,
+                    qMedium:data[key].qMedium,
+                    qSmall:data[key].qSmall
+            })
+        } 
+        setShoes(loadedShoes)
+      
+        }catch(error){
+           alert(error.message)
         }
         
+    },[])
 
-    }
+
+    const onAddShoeHandler=useCallback(async(event)=>{
+        event.preventDefault();
+
+        if(nameInputRef.current.value.trim().length === 0 || desInputRef.current.value.trim().length === 0 || priceInputRef.current.value<0 || largeInputRef.current.value<0 || mediumInputRef.current.value<0 || smallInputRef.current.value<0){
+            alert('Please enter all the details')
+            return;
+        }
+        const shoe={
+            name:nameInputRef.current.value,
+            description:desInputRef.current.value,
+            price:+priceInputRef.current.value,
+            qLarge:+largeInputRef.current.value,
+            qMedium:+mediumInputRef.current.value,
+            qSmall:+smallInputRef.current.value
+        }
+        try{
+            const response = await fetch('https://shoe-react-project-default-rtdb.firebaseio.com/shoes.json',{
+            method:'POST',
+            body:JSON.stringify(shoe),
+            headers:{
+                'Content-Type':'application/json'
+            }
+        })
+        if(!response.ok){
+            throw new Error('Something went wrong');
+        }
+        const data=await response.json();
+        console.log(data)
+        }catch(err){
+            alert(err.message);
+        }
+
+        nameInputRef.current.value=''
+        desInputRef.current.value=''
+        priceInputRef.current.value=''
+        largeInputRef.current.value=''
+        mediumInputRef.current.value=''
+        smallInputRef.current.value=''
+        fetchShoeList()
+    },[fetchShoeList])
+
+    
+    useEffect(()=>{
+        fetchShoeList();
+    },[fetchShoeList])
 
     return(
         <Fragment>
@@ -35,7 +99,7 @@ const AddShoes = props => {
                     <input type="text" id="des" ref={desInputRef}/>
                     <label htmlFor='price'>Price:</label>
                     <input type="number" id="price" ref={priceInputRef}/>
-                    <h3>Quantity</h3>
+                    <h3>Avaliable Quantity</h3>
                     <label htmlFor="l">Large:</label>
                     <input type="number" id="l" ref={largeInputRef}/>
                     <label htmlFor="m">Medium:</label>
@@ -45,6 +109,7 @@ const AddShoes = props => {
                     <button type="submit">Add Product</button>
                 </form>
             </Card>
+            <ShoesAvailableList shoes={shoes}  fetchShoeList={fetchShoeList}/>
         </Fragment>
     )
 }
